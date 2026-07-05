@@ -27,6 +27,16 @@ python3 -m http.server 8000
 
 その後、ブラウザで `http://localhost:8000` を開きます。
 
+## モバイル回帰テスト
+
+Chrome をリモートデバッグ付きで起動した状態で、390×844 の全流程テストを実行できます。
+
+```bash
+node tests/mobile-smoke.mjs
+```
+
+開始、音声切替、四つの調査、開扉、エンディング、水平オーバーフローを検証します。
+
 ## 公開方法
 
 すべて静的ファイルなので、GitHub Pages、Cloudflare Pages、Netlify、
