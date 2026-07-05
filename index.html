@@ -24,11 +24,20 @@
               <span id="progress-fill"></span>
             </div>
           </div>
+          <button
+            id="audio-button"
+            class="icon-button audio-button"
+            type="button"
+            aria-pressed="true"
+          >
+            音：ON
+          </button>
           <button id="reset-button" class="icon-button" type="button">最初から</button>
         </div>
       </header>
 
       <section id="room" class="room" aria-label="古い書斎">
+        <p class="room-chapter">澪の書斎 — 失踪から七日目</p>
         <div class="wall-light" aria-hidden="true"></div>
         <div class="ceiling-line" aria-hidden="true"></div>
 
@@ -103,6 +112,21 @@
         </p>
       </section>
 
+      <section class="memory-strip" aria-labelledby="memory-title">
+        <div class="memory-copy">
+          <p id="memory-title" class="eyebrow">MEMORY LOG</p>
+          <p id="memory-text" aria-live="polite">
+            妹の澪が消えた夜、この部屋だけが内側から閉ざされた。
+          </p>
+        </div>
+        <div class="fragment-tray" aria-label="集めた鍵の欠片">
+          <span data-fragment="clock">☾</span>
+          <span data-fragment="painting">✦</span>
+          <span data-fragment="book">≈</span>
+          <span data-fragment="plant">☀</span>
+        </div>
+      </section>
+
       <footer class="hintbar">
         <p><span class="pulse-dot"></span>光っている場所をクリックして調べる</p>
         <button id="hint-button" class="text-button" type="button">ヒントを見る</button>
@@ -114,11 +138,14 @@
         <p class="eyebrow">A TINY MYSTERY</p>
         <h2 id="intro-title">四つの欠片</h2>
         <p>
-          目を覚ますと、見知らぬ書斎にいた。<br />
-          扉には四つの空洞がある。
+          妹の澪が姿を消して、七日。<br />
+          今夜、封じられていた彼女の書斎から<br />
+          小さなオルゴールの音が聞こえた。
         </p>
-        <p class="intro-note">部屋に隠された四つの欠片を探し、ここから脱出しよう。</p>
-        <button id="start-button" class="primary-button" type="button">調査を始める</button>
+        <p class="intro-note">
+          扉には四つの空洞がある。澪が残した記憶を辿り、閉ざされた扉の向こうへ。
+        </p>
+        <button id="start-button" class="primary-button" type="button">澪の書斎へ入る</button>
       </div>
     </section>
 
@@ -135,6 +162,7 @@
         <p id="dialog-kicker" class="eyebrow"></p>
         <h2 id="dialog-title"></h2>
         <p id="dialog-text"></p>
+        <blockquote id="dialog-memory" class="dialog-memory"></blockquote>
         <div id="fragment" class="fragment" aria-live="polite">
           <span>鍵の欠片を見つけた</span>
           <strong id="fragment-mark"></strong>
@@ -147,9 +175,13 @@
       <div class="ending-card">
         <div class="ending-halo" aria-hidden="true"></div>
         <p class="eyebrow">ESCAPED</p>
-        <h2 id="ending-title">扉の向こうへ</h2>
-        <p>四つの欠片がひとつの鍵になった。</p>
-        <p>冷たい夜風が頬を撫でる。あなたは無事、部屋を脱出した。</p>
+        <h2 id="ending-title">澪の残響</h2>
+        <p>四つの欠片がひとつの鍵になり、扉の奥に細い階段が現れた。</p>
+        <p>
+          暗闇の先で、あのオルゴールがもう一度鳴る。<br />
+          「ここまで来てくれると思ってた」——澪の声だった。
+        </p>
+        <p class="ending-note">物語は、扉の向こうへ続く。</p>
         <button id="replay-button" class="primary-button" type="button">もう一度遊ぶ</button>
       </div>
     </section>

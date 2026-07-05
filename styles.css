@@ -123,6 +123,10 @@ h2 {
   font-size: 0.75rem;
 }
 
+.audio-button[aria-pressed="true"] {
+  color: var(--gold-bright);
+}
+
 .text-button {
   padding: 10px 0;
   text-decoration: underline;
@@ -142,6 +146,18 @@ h2 {
     linear-gradient(#41382e 0 70%, #28231e 70%);
   box-shadow: 0 30px 80px var(--shadow), inset 0 0 100px rgba(0, 0, 0, 0.45);
   isolation: isolate;
+}
+
+.room-chapter {
+  position: absolute;
+  z-index: 6;
+  top: 3.5%;
+  left: 4%;
+  margin: 0;
+  color: rgba(232, 224, 208, 0.52);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.55rem, 1vw, 0.72rem);
+  letter-spacing: 0.16em;
 }
 
 .room::before,
@@ -171,7 +187,7 @@ h2 {
   position: absolute;
   z-index: 0;
   top: -20%;
-  left: 27%;
+  left: 30%;
   width: 44%;
   height: 85%;
   opacity: 0.45;
@@ -246,7 +262,7 @@ h2 {
 
 .clock {
   top: 17%;
-  left: 13%;
+  left: 42%;
   width: 92px;
   height: 92px;
   padding: 9px;
@@ -288,10 +304,10 @@ h2 {
 }
 
 .painting {
-  top: 20%;
-  left: 33%;
-  width: 23%;
-  height: 31%;
+  top: 21%;
+  left: 7%;
+  width: 22%;
+  height: 30%;
   padding: 10px;
   border: 8px ridge #685034;
   background: #171717;
@@ -341,8 +357,8 @@ h2 {
   position: absolute;
   z-index: 2;
   bottom: 19%;
-  left: 24%;
-  width: 42%;
+  left: 32%;
+  width: 35%;
   height: 23%;
 }
 
@@ -374,7 +390,7 @@ h2 {
 
 .book {
   bottom: 40%;
-  left: 40%;
+  left: 43%;
   width: 120px;
   height: 56px;
   transform: rotate(-4deg);
@@ -410,7 +426,7 @@ h2 {
 }
 
 .plant {
-  right: 13%;
+  right: 25%;
   bottom: 19%;
   width: 110px;
   height: 180px;
@@ -452,7 +468,7 @@ h2 {
 
 .door {
   top: 18%;
-  right: 27%;
+  right: 7%;
   width: 15%;
   height: 52%;
   overflow: hidden;
@@ -552,6 +568,56 @@ h2 {
   backdrop-filter: blur(8px);
 }
 
+.memory-strip {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 28px;
+  min-height: 86px;
+  margin-top: 12px;
+  padding: 15px 20px;
+  border: 1px solid rgba(216, 199, 167, 0.13);
+  background:
+    linear-gradient(90deg, rgba(217, 168, 94, 0.05), transparent 42%),
+    rgba(19, 23, 27, 0.72);
+}
+
+.memory-copy .eyebrow {
+  margin-bottom: 5px;
+}
+
+.memory-copy p:last-child {
+  margin: 0;
+  color: #c7bdaf;
+  font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+  font-size: clamp(0.78rem, 1.5vw, 0.95rem);
+  line-height: 1.65;
+}
+
+.fragment-tray {
+  display: flex;
+  gap: 10px;
+}
+
+.fragment-tray span {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 1px solid rgba(216, 199, 167, 0.16);
+  border-radius: 50%;
+  color: rgba(216, 199, 167, 0.18);
+  background: rgba(0, 0, 0, 0.16);
+  font-family: "Yu Mincho", serif;
+  transition: color 350ms ease, border-color 350ms ease, box-shadow 350ms ease;
+}
+
+.fragment-tray span.is-found {
+  border-color: rgba(217, 168, 94, 0.7);
+  color: var(--gold-bright);
+  box-shadow: 0 0 16px rgba(217, 168, 94, 0.2);
+}
+
 .hintbar {
   padding: 13px 3px 0;
   color: var(--muted);
@@ -606,6 +672,16 @@ h2 {
   text-align: center;
 }
 
+.dialog-card {
+  max-height: calc(100vh - 32px);
+  padding: clamp(24px, 4vw, 38px) clamp(28px, 6vw, 58px);
+  overflow-y: auto;
+}
+
+.dialog-card h2 {
+  font-size: clamp(1.9rem, 5vw, 3rem);
+}
+
 .intro-card p:not(.eyebrow),
 .dialog-card p:not(.eyebrow),
 .ending-card p:not(.eyebrow) {
@@ -623,6 +699,18 @@ h2 {
   padding-top: 18px;
   border-top: 1px solid var(--line);
   font-size: 0.85rem;
+}
+
+.dialog-memory {
+  margin: 14px 0 0;
+  padding: 12px 16px;
+  border-left: 2px solid var(--gold);
+  color: #d9c8ae;
+  background: rgba(217, 168, 94, 0.055);
+  font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+  font-size: 0.9rem;
+  line-height: 1.65;
+  text-align: left;
 }
 
 .primary-button {
@@ -657,9 +745,9 @@ h2 {
 }
 
 .found-symbol {
-  width: 76px;
-  height: 76px;
-  margin: 0 auto 22px;
+  width: 58px;
+  height: 58px;
+  margin: 0 auto 13px;
   border: 1px solid rgba(217, 168, 94, 0.5);
   border-radius: 50%;
   background: radial-gradient(circle, rgba(217, 168, 94, 0.28), transparent 66%);
@@ -671,8 +759,8 @@ h2 {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin-top: 24px;
-  padding: 12px 16px;
+  margin-top: 14px;
+  padding: 9px 14px;
   border: 1px solid rgba(217, 168, 94, 0.3);
   color: #c6bcae;
   background: rgba(217, 168, 94, 0.06);
@@ -687,6 +775,12 @@ h2 {
 
 .ending-card {
   overflow: hidden;
+}
+
+.ending-note {
+  color: var(--gold) !important;
+  font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+  letter-spacing: 0.08em;
 }
 
 .ending-halo {
@@ -725,14 +819,20 @@ h2 {
 
   .topbar {
     align-items: flex-end;
+    gap: 10px;
   }
 
   .topbar-actions {
-    gap: 8px;
+    gap: 3px;
   }
 
   .progress {
-    width: 120px;
+    width: 96px;
+  }
+
+  .icon-button {
+    padding: 7px 5px;
+    font-size: 0.68rem;
   }
 
   .room {
@@ -741,46 +841,66 @@ h2 {
   }
 
   .painting {
-    top: 18%;
-    left: 23%;
+    top: 20%;
+    left: 5%;
     width: 34%;
     height: 25%;
   }
 
   .clock {
     top: 20%;
-    left: 6%;
+    left: 45%;
     width: 66px;
     height: 66px;
     border-width: 6px;
   }
 
   .door {
-    top: 30%;
-    right: 8%;
+    top: 31%;
+    right: 5%;
     width: 24%;
     height: 40%;
   }
 
   .desk {
     bottom: 17%;
-    left: 15%;
-    width: 57%;
+    left: 9%;
+    width: 58%;
     height: 20%;
   }
 
   .book {
     bottom: 35%;
-    left: 32%;
+    left: 27%;
     width: 92px;
     height: 44px;
   }
 
   .plant {
-    right: 4%;
+    right: 25%;
     bottom: 14%;
-    width: 88px;
-    height: 145px;
+    width: 76px;
+    height: 126px;
+  }
+
+  .room-message {
+    bottom: 4%;
+    max-width: 92%;
+  }
+
+  .memory-strip {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 14px;
+  }
+
+  .fragment-tray {
+    justify-content: flex-start;
+  }
+
+  .fragment-tray span {
+    width: 31px;
+    height: 31px;
   }
 
   .hintbar {
