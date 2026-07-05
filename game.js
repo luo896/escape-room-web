@@ -53,6 +53,7 @@ const state = {
   found: new Set(),
   doorUnlocked: false,
   doorOpen: false,
+  currentRoom: 1,
   activeObject: null,
   audioEnabled: true,
   clockHour: 12,
@@ -60,6 +61,7 @@ const state = {
   paintingSequence: [],
   bookLetters: ["", "", ""],
   plantAngles: [0, 0, 0, 0],
+  finalSequence: [],
 };
 
 let audioContext = null;
@@ -107,6 +109,13 @@ const elements = {
   progressLabel: document.querySelector("#progress-label"),
   progressFill: document.querySelector("#progress-fill"),
   roomMessage: document.querySelector("#room-message"),
+  room: document.querySelector("#room"),
+  secondRoom: document.querySelector("#second-room"),
+  secondRoomMessage: document.querySelector("#second-room-message"),
+  finalSymbols: [...document.querySelectorAll("[data-final-symbol]")],
+  finalSequenceSlots: [...document.querySelectorAll(".final-sequence span")],
+  finalStep: document.querySelector("#final-step"),
+  finalFeedback: document.querySelector("#final-feedback"),
   door: document.querySelector("#door"),
   hintButton: document.querySelector("#hint-button"),
   audioButton: document.querySelector("#audio-button"),
@@ -543,6 +552,13 @@ function closeDialog() {
 }
 
 function showHint() {
+  if (state.currentRoom === 2) {
+    elements.secondRoomMessage.textContent =
+      "碑文を情景の順に読もう。月と星の夜空から、波を越えて、太陽の夜明けへ。";
+    elements.finalSymbols[0]?.focus();
+    return;
+  }
+
   if (state.doorOpen) {
     setRoomMessage("開いた扉をクリックして、次の場所へ進もう。");
     elements.door.focus();
@@ -595,24 +611,79 @@ function enterDoor() {
     return;
   }
 
+  state.currentRoom = 2;
+  elements.room.hidden = true;
+  elements.secondRoom.hidden = false;
+  elements.progressLabel.textContent = "第二の部屋";
+  elements.progressFill.style.width = "100%";
+  elements.memoryText.textContent =
+    "四つの欠片は、地下の台座にある月、星、波、太陽の紋章と同じ形をしている。";
+  elements.secondRoomMessage.textContent =
+    "四つの欠片と、台座に刻まれた言葉を重ねよう。";
+  updateFinalPuzzle();
+  playSound("door");
+  elements.finalSymbols[0]?.focus();
+}
+
+function updateFinalPuzzle() {
+  const marks = { moon: "☾", star: "✦", wave: "≈", sun: "☀" };
+  elements.finalStep.textContent = `${state.finalSequence.length} / 4`;
+  elements.finalSequenceSlots.forEach((slot, index) => {
+    const value = state.finalSequence[index];
+    slot.textContent = value ? marks[value] : "";
+    slot.classList.toggle("is-filled", Boolean(value));
+  });
+}
+
+function solveFinalPuzzle() {
+  elements.finalFeedback.textContent = "";
+  elements.secondRoomMessage.textContent =
+    "台座が開いた。澪が残した最後の録音が再生される。";
   playSound("ending");
-  showOverlay(elements.ending);
+  window.setTimeout(() => showOverlay(elements.ending), 220);
+}
+
+function selectFinalSymbol(symbol) {
+  const solution = ["moon", "star", "wave", "sun"];
+  const expected = solution[state.finalSequence.length];
+
+  if (symbol !== expected) {
+    state.finalSequence = [];
+    elements.finalFeedback.textContent =
+      "紋章の光が消えた。碑文の情景を、最初から辿り直そう。";
+    updateFinalPuzzle();
+    playSound("wrong");
+    return;
+  }
+
+  state.finalSequence.push(symbol);
+  elements.finalFeedback.textContent = "";
+  updateFinalPuzzle();
+  playSound("ui");
+
+  if (state.finalSequence.length === solution.length) {
+    solveFinalPuzzle();
+  }
 }
 
 function resetGame({ showIntro = false } = {}) {
   state.found.clear();
   state.doorUnlocked = false;
   state.doorOpen = false;
+  state.currentRoom = 1;
   state.activeObject = null;
   state.clockHour = 12;
   state.clockMinute = 0;
   state.paintingSequence = [];
   state.bookLetters = ["", "", ""];
   state.plantAngles = [0, 0, 0, 0];
+  state.finalSequence = [];
 
   elements.hotspots.forEach((hotspot) => hotspot.classList.remove("is-found"));
   elements.door.classList.remove("is-unlocked", "is-open");
   elements.door.setAttribute("aria-label", "閉ざされた扉");
+  elements.room.hidden = false;
+  elements.secondRoom.hidden = true;
   hideOverlay(elements.dialog);
   hideOverlay(elements.ending);
   elements.clockPuzzle.hidden = true;
@@ -623,6 +694,8 @@ function resetGame({ showIntro = false } = {}) {
   resetBookPuzzle();
   elements.plantPuzzle.hidden = true;
   resetPlantPuzzle();
+  elements.finalFeedback.textContent = "";
+  updateFinalPuzzle();
   elements.fragment.hidden = false;
   updateProgress();
   elements.memoryText.textContent =
@@ -681,6 +754,9 @@ elements.plantLeaves.forEach((leaf) => {
   leaf.addEventListener("click", () => rotatePlantLeaf(Number(leaf.dataset.plantLeaf)));
 });
 elements.plantSubmitButton.addEventListener("click", solvePlant);
+elements.finalSymbols.forEach((symbol) => {
+  symbol.addEventListener("click", () => selectFinalSymbol(symbol.dataset.finalSymbol));
+});
 elements.resetButton.addEventListener("click", () => resetGame({ showIntro: true }));
 elements.replayButton.addEventListener("click", () => resetGame());
 

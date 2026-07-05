@@ -112,6 +112,35 @@
         </p>
       </section>
 
+      <section id="second-room" class="room second-room" aria-label="地下の観測室" hidden>
+        <p class="room-chapter">地下観測室 — 澪の残した道</p>
+        <div class="observatory-arch" aria-hidden="true"></div>
+        <div class="observatory-light" aria-hidden="true"></div>
+        <div class="final-pedestal">
+          <p class="final-inscription">
+            夜空から水面へ。<br />
+            そして夜明けへ。
+          </p>
+          <div class="final-symbols" aria-label="四つの記憶の紋章">
+            <button type="button" data-final-symbol="moon" aria-label="月の紋章">☾</button>
+            <button type="button" data-final-symbol="star" aria-label="星の紋章">✦</button>
+            <button type="button" data-final-symbol="wave" aria-label="波の紋章">≈</button>
+            <button type="button" data-final-symbol="sun" aria-label="太陽の紋章">☀</button>
+          </div>
+          <div class="final-sequence" aria-label="選んだ紋章の順序">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <output id="final-step" aria-live="polite">0 / 4</output>
+          <p id="final-feedback" class="final-feedback" role="status"></p>
+        </div>
+        <p id="second-room-message" class="room-message" aria-live="polite">
+          四つの欠片と、台座に刻まれた言葉を重ねよう。
+        </p>
+      </section>
+
       <section class="memory-strip" aria-labelledby="memory-title">
         <div class="memory-copy">
           <p id="memory-title" class="eyebrow">MEMORY LOG</p>
@@ -353,12 +382,12 @@
         <div class="ending-halo" aria-hidden="true"></div>
         <p class="eyebrow">ESCAPED</p>
         <h2 id="ending-title">澪の残響</h2>
-        <p>四つの欠片がひとつの鍵になり、扉の奥に細い階段が現れた。</p>
+        <p>月、星、波、太陽。四つの記憶を辿ると、地下の台座が静かに開いた。</p>
         <p>
-          暗闇の先で、あのオルゴールがもう一度鳴る。<br />
-          「ここまで来てくれると思ってた」——澪の声だった。
+          中には海辺の切符と、小さな録音機が残されている。<br />
+          「ここまで来てくれると思ってた。次は、海で会おう」——澪の声だった。
         </p>
-        <p class="ending-note">物語は、扉の向こうへ続く。</p>
+        <p class="ending-note">TRUE END — 約束の海へ</p>
         <button id="replay-button" class="primary-button" type="button">もう一度遊ぶ</button>
       </div>
     </section>

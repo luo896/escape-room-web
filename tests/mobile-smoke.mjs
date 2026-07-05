@@ -205,6 +205,21 @@ try {
         click("#door");
         await wait(150);
 
+        const secondRoomVisible = !document.querySelector("#second-room").hidden;
+        const firstRoomHidden = document.querySelector("#room").hidden;
+        const endingBeforeFinal =
+          document.querySelector("#ending").classList.contains("is-visible");
+        click('[data-final-symbol="star"]');
+        const finalWrongAnswer =
+          document.querySelector("#final-feedback").textContent.trim();
+        const finalProgressBeforeSolve =
+          document.querySelector("#final-step").textContent.trim();
+        for (const symbol of ["moon", "star", "wave", "sun"]) {
+          click('[data-final-symbol="' + symbol + '"]');
+          await wait(50);
+        }
+        await wait(300);
+
         const endingCard = document.querySelector(".ending-card").getBoundingClientRect();
         const endingVisible = document.querySelector("#ending").classList.contains("is-visible");
         click("#replay-button");
@@ -216,6 +231,9 @@ try {
           clockTime: document.querySelector("#clock-time").textContent.trim(),
           fragmentCount: document.querySelectorAll(".fragment-tray .is-found").length,
           feedback: document.querySelector("#clock-feedback").textContent.trim(),
+          secondRoomHidden: document.querySelector("#second-room").hidden,
+          finalStep: document.querySelector("#final-step").textContent.trim(),
+          finalFeedback: document.querySelector("#final-feedback").textContent.trim(),
         };
         click("#dialog-action");
         click('[data-object="painting"]');
@@ -265,6 +283,11 @@ try {
           progress: completedProgress,
           fragmentCount: completedFragmentCount,
           doorOpen,
+          secondRoomVisible,
+          firstRoomHidden,
+          endingBeforeFinal,
+          finalWrongAnswer,
+          finalProgressBeforeSolve,
           endingVisible,
           resetState,
         };
@@ -302,8 +325,14 @@ try {
       report.plantProgressBeforeSolve === "手がかり 2 / 4" &&
       report.plantAngles.join("|") ===
         "translateX(-50%) rotate(0deg)|translateX(-50%) rotate(90deg)|translateX(-50%) rotate(180deg)|translateX(-50%) rotate(270deg)",
+    secondRoomPuzzle:
+      report.secondRoomVisible &&
+      report.firstRoomHidden &&
+      !report.endingBeforeFinal &&
+      report.finalWrongAnswer.length > 0 &&
+      report.finalProgressBeforeSolve === "0 / 4",
     completed: report.progress === "手がかり 4 / 4" && report.fragmentCount === 4,
-    escaped: report.doorOpen && report.endingVisible,
+    escaped: report.doorOpen && report.secondRoomVisible && report.endingVisible,
     reset:
       report.resetState.progress === "手がかり 0 / 4" &&
       report.resetState.clockTime === "12:00" &&
@@ -316,7 +345,10 @@ try {
       report.resetState.plantAngles.every(
         (transform) => transform === "translateX(-50%) rotate(0deg)",
       ) &&
-      report.resetState.plantFeedback === "",
+      report.resetState.plantFeedback === "" &&
+      report.resetState.secondRoomHidden &&
+      report.resetState.finalStep === "0 / 4" &&
+      report.resetState.finalFeedback === "",
   };
 
   console.log(JSON.stringify({ checks, report }, null, 2));

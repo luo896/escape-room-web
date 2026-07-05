@@ -572,6 +572,143 @@ h2 {
   backdrop-filter: blur(8px);
 }
 
+.second-room {
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 20%, rgba(94, 135, 157, 0.22), transparent 27%),
+    linear-gradient(145deg, #0d1419, #111a20 48%, #080d11);
+}
+
+.observatory-arch {
+  position: absolute;
+  top: 8%;
+  left: 50%;
+  width: 58%;
+  height: 70%;
+  border: 10px solid rgba(63, 77, 83, 0.72);
+  border-bottom: 0;
+  border-radius: 50% 50% 0 0;
+  background:
+    radial-gradient(circle at 34% 26%, #d7d1ab 0 2px, transparent 3px),
+    radial-gradient(circle at 67% 18%, #d7d1ab 0 1px, transparent 2px),
+    radial-gradient(circle at 77% 42%, #d7d1ab 0 2px, transparent 3px),
+    linear-gradient(#101a27, #182537 58%, #091015);
+  box-shadow: inset 0 0 55px rgba(3, 6, 10, 0.7), 0 0 60px rgba(74, 113, 134, 0.12);
+  transform: translateX(-50%);
+}
+
+.observatory-arch::after {
+  position: absolute;
+  right: -18%;
+  bottom: 0;
+  left: -18%;
+  height: 26%;
+  background:
+    repeating-radial-gradient(ellipse at 50% 100%, transparent 0 12px, rgba(122, 156, 168, 0.14) 13px 15px),
+    linear-gradient(transparent, rgba(15, 60, 74, 0.6));
+  content: "";
+}
+
+.observatory-light {
+  position: absolute;
+  top: 5%;
+  left: 50%;
+  width: 28%;
+  height: 60%;
+  opacity: 0.32;
+  background: linear-gradient(rgba(150, 199, 212, 0.42), transparent);
+  clip-path: polygon(42% 0, 58% 0, 100% 100%, 0 100%);
+  transform: translateX(-50%);
+}
+
+.final-pedestal {
+  position: absolute;
+  z-index: 4;
+  top: 23%;
+  left: 50%;
+  width: min(390px, 74%);
+  padding: 18px 22px 20px;
+  border: 1px solid rgba(159, 190, 193, 0.34);
+  color: #bdc9c8;
+  background: rgba(8, 14, 17, 0.82);
+  box-shadow: 0 22px 55px rgba(0, 0, 0, 0.55), inset 0 0 28px rgba(77, 123, 131, 0.08);
+  text-align: center;
+  transform: translateX(-50%);
+}
+
+.final-inscription {
+  margin: 0 0 12px;
+  color: #aab9b7;
+  font-family: "Yu Mincho", serif;
+  font-size: clamp(0.72rem, 1.5vw, 0.88rem);
+  line-height: 1.65;
+  letter-spacing: 0.08em;
+}
+
+.final-symbols {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.final-symbols button {
+  aspect-ratio: 1;
+  border: 1px solid rgba(169, 194, 193, 0.35);
+  border-radius: 50%;
+  color: #cfddd8;
+  background: rgba(60, 94, 96, 0.13);
+  box-shadow: inset 0 0 16px rgba(93, 145, 145, 0.08);
+  cursor: pointer;
+  font-family: "Yu Mincho", serif;
+  font-size: clamp(1rem, 3vw, 1.4rem);
+  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+}
+
+.final-symbols button:hover,
+.final-symbols button:focus-visible {
+  border-color: #a7c8c4;
+  background: rgba(94, 145, 145, 0.24);
+  outline: 0;
+  transform: translateY(-2px);
+}
+
+.final-sequence {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.final-sequence span {
+  display: grid;
+  width: 25px;
+  height: 25px;
+  place-items: center;
+  border-bottom: 1px solid rgba(169, 194, 193, 0.3);
+  color: rgba(199, 219, 215, 0.28);
+}
+
+.final-sequence span.is-filled {
+  border-color: #9fc4bc;
+  color: #d8e7de;
+  text-shadow: 0 0 12px rgba(164, 219, 202, 0.6);
+}
+
+#final-step {
+  display: block;
+  margin-top: 7px;
+  color: #78938f;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.68rem;
+}
+
+.final-feedback {
+  min-height: 1.5em;
+  margin: 7px 0 0;
+  color: #d58e7a;
+  font-size: 0.72rem;
+}
+
 .memory-strip {
   display: grid;
   grid-template-columns: 1fr auto;
