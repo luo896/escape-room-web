@@ -70,6 +70,8 @@ const client = createClient(target.webSocketDebuggerUrl);
 try {
   await client.send("Page.enable");
   await client.send("Runtime.enable");
+  await client.send("Network.enable");
+  await client.send("Network.setCacheDisabled", { cacheDisabled: true });
   await client.send("Emulation.setDeviceMetricsOverride", {
     width: VIEWPORT_WIDTH,
     height: VIEWPORT_HEIGHT,
@@ -109,7 +111,28 @@ try {
         const audioOn = document.querySelector("#audio-button").getAttribute("aria-pressed");
 
         const stories = [];
-        for (const id of ["painting", "book", "plant"]) {
+
+        click('[data-object="painting"]');
+        await wait(80);
+        click('[data-painting-symbol="moon"]');
+        const paintingWrongAnswer =
+          document.querySelector("#painting-feedback").textContent.trim();
+        const paintingProgressBeforeSolve =
+          document.querySelector("#progress-label").textContent.trim();
+        for (const symbol of ["mountain", "moon", "star"]) {
+          click('[data-painting-symbol="' + symbol + '"]');
+          await wait(60);
+        }
+        await wait(240);
+        stories.push({
+          id: "painting",
+          visible: document.querySelector("#dialog").classList.contains("is-visible"),
+          quote: document.querySelector("#dialog-memory").textContent.trim(),
+        });
+        click("#dialog-action");
+        await wait(100);
+
+        for (const id of ["book", "plant"]) {
           click('[data-object="' + id + '"]');
           await wait(80);
           stories.push({
@@ -158,6 +181,12 @@ try {
           fragmentCount: document.querySelectorAll(".fragment-tray .is-found").length,
           feedback: document.querySelector("#clock-feedback").textContent.trim(),
         };
+        click("#dialog-action");
+        click('[data-object="painting"]');
+        await wait(80);
+        resetState.paintingStep = document.querySelector("#painting-step").textContent.trim();
+        resetState.paintingFeedback =
+          document.querySelector("#painting-feedback").textContent.trim();
 
         return {
           viewport: { width: innerWidth, height: innerHeight },
@@ -171,6 +200,8 @@ try {
             endingCard.bottom <= innerHeight,
           audioOff,
           audioOn,
+          paintingWrongAnswer,
+          paintingProgressBeforeSolve,
           wrongAnswer,
           progressBeforeSolve,
           clockTime,
@@ -204,13 +235,18 @@ try {
       report.wrongAnswer.length > 0 &&
       report.progressBeforeSolve === "手がかり 3 / 4" &&
       report.clockTime === "07:20",
+    paintingPuzzle:
+      report.paintingWrongAnswer.length > 0 &&
+      report.paintingProgressBeforeSolve === "手がかり 0 / 4",
     completed: report.progress === "手がかり 4 / 4" && report.fragmentCount === 4,
     escaped: report.doorOpen && report.endingVisible,
     reset:
       report.resetState.progress === "手がかり 0 / 4" &&
       report.resetState.clockTime === "12:00" &&
       report.resetState.fragmentCount === 0 &&
-      report.resetState.feedback === "",
+      report.resetState.feedback === "" &&
+      report.resetState.paintingStep === "0 / 3" &&
+      report.resetState.paintingFeedback === "",
   };
 
   console.log(JSON.stringify({ checks, report }, null, 2));

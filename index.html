@@ -187,6 +187,49 @@
             この時刻で合わせる
           </button>
         </section>
+        <section
+          id="painting-puzzle"
+          class="puzzle-panel painting-puzzle"
+          aria-labelledby="painting-puzzle-title"
+          hidden
+        >
+          <div class="puzzle-heading">
+            <p id="painting-puzzle-title">指の跡を、正しい順になぞる</p>
+            <span id="painting-step" class="painting-step">0 / 3</span>
+          </div>
+          <div class="painting-puzzle-scene" aria-label="山、月、星が描かれた夜の絵">
+            <button
+              class="painting-symbol painting-symbol-star"
+              type="button"
+              data-painting-symbol="star"
+              aria-label="星をなぞる"
+            >
+              ✦
+            </button>
+            <button
+              class="painting-symbol painting-symbol-moon"
+              type="button"
+              data-painting-symbol="moon"
+              aria-label="月をなぞる"
+            >
+              ●
+            </button>
+            <button
+              class="painting-symbol painting-symbol-mountain"
+              type="button"
+              data-painting-symbol="mountain"
+              aria-label="山をなぞる"
+            >
+              山
+            </button>
+          </div>
+          <div class="sequence-track" aria-label="入力した順序">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <p id="painting-feedback" class="puzzle-feedback" role="status"></p>
+        </section>
         <div id="fragment" class="fragment" aria-live="polite">
           <span>鍵の欠片を見つけた</span>
           <strong id="fragment-mark"></strong>

@@ -13,9 +13,12 @@ const OBJECTS = {
   },
   painting: {
     kicker: "ふたりで描いた風景",
-    title: "月のない夜",
-    text: "幼い頃、澪と一緒に描いた山の絵だ。額縁の裏に、星形の金属片と短い手紙が貼られている。",
-    memory: "『月は七つ目の刻で、山の稜線に触れた。入口は絵の中と同じ場所にある』",
+    title: "指でなぞられた夜",
+    text: "幼い頃、澪と一緒に描いた山の絵だ。山、月、星の表面だけに、指で何度もなぞった跡が残っている。",
+    memory: "『足元から空へ。近いものから、もっと遠いものへ。私が見た順になぞって』",
+    solvedTitle: "山、月、星",
+    solvedText: "山から月へ、月から星へ。最後の星に触れると額縁が外れ、裏から星形の金属片が現れた。",
+    solvedMemory: "『月は七つ目の刻で、山の稜線に触れた。入口は絵の中と同じ場所にある』",
     mark: "星",
     symbol: "✦",
     message: "古い絵は、扉の向こうの景色を描いている。",
@@ -48,6 +51,7 @@ const state = {
   audioEnabled: true,
   clockHour: 12,
   clockMinute: 0,
+  paintingSequence: [],
 };
 
 let audioContext = null;
@@ -77,6 +81,11 @@ const elements = {
   clockFeedback: document.querySelector("#clock-feedback"),
   paintingClue: document.querySelector("#painting-clue"),
   bookClue: document.querySelector("#book-clue"),
+  paintingPuzzle: document.querySelector("#painting-puzzle"),
+  paintingStep: document.querySelector("#painting-step"),
+  paintingSymbols: [...document.querySelectorAll("[data-painting-symbol]")],
+  paintingSequenceSlots: [...document.querySelectorAll(".sequence-track span")],
+  paintingFeedback: document.querySelector("#painting-feedback"),
   fragment: document.querySelector("#fragment"),
   fragmentMark: document.querySelector("#fragment-mark"),
   progressLabel: document.querySelector("#progress-label"),
@@ -321,6 +330,49 @@ function solveClock() {
   elements.memoryText.textContent = object.solvedMemory;
 }
 
+function updatePaintingPuzzle() {
+  elements.paintingStep.textContent = `${state.paintingSequence.length} / 3`;
+  elements.paintingSequenceSlots.forEach((slot, index) => {
+    const value = state.paintingSequence[index];
+    slot.textContent = value ? { mountain: "山", moon: "月", star: "星" }[value] : "";
+    slot.classList.toggle("is-filled", Boolean(value));
+  });
+}
+
+function solvePainting() {
+  const object = OBJECTS.painting;
+  elements.paintingPuzzle.hidden = true;
+  elements.fragment.hidden = false;
+  elements.dialogTitle.textContent = object.solvedTitle;
+  elements.dialogText.textContent = object.solvedText;
+  elements.dialogMemory.textContent = object.solvedMemory;
+  collectObject("painting");
+  elements.memoryText.textContent = object.solvedMemory;
+}
+
+function selectPaintingSymbol(symbol) {
+  const solution = ["mountain", "moon", "star"];
+  const expected = solution[state.paintingSequence.length];
+
+  if (symbol !== expected) {
+    state.paintingSequence = [];
+    elements.paintingFeedback.textContent =
+      "絵の光が消えた。地面に近いものから、もう一度なぞろう。";
+    updatePaintingPuzzle();
+    playSound("wrong");
+    return;
+  }
+
+  state.paintingSequence.push(symbol);
+  elements.paintingFeedback.textContent = "";
+  updatePaintingPuzzle();
+  playSound("ui");
+
+  if (state.paintingSequence.length === solution.length) {
+    window.setTimeout(solvePainting, 180);
+  }
+}
+
 function inspectObject(id) {
   const object = OBJECTS[id];
   if (!object) return;
@@ -333,6 +385,7 @@ function inspectObject(id) {
   elements.dialogSymbol.textContent = object.symbol;
   elements.fragmentMark.textContent = object.mark;
   elements.clockPuzzle.hidden = true;
+  elements.paintingPuzzle.hidden = true;
   elements.fragment.hidden = false;
 
   if (id === "clock" && !state.found.has("clock")) {
@@ -341,10 +394,21 @@ function inspectObject(id) {
     elements.clockFeedback.textContent = "";
     updateClockPuzzle();
     playSound("ui");
+  } else if (id === "painting" && !state.found.has("painting")) {
+    elements.paintingPuzzle.hidden = false;
+    elements.fragment.hidden = true;
+    state.paintingSequence = [];
+    elements.paintingFeedback.textContent = "";
+    updatePaintingPuzzle();
+    playSound("ui");
   } else if (!state.found.has(id)) {
     collectObject(id);
   } else {
     if (id === "clock") {
+      elements.dialogTitle.textContent = object.solvedTitle;
+      elements.dialogText.textContent = object.solvedText;
+      elements.dialogMemory.textContent = object.solvedMemory;
+    } else if (id === "painting") {
       elements.dialogTitle.textContent = object.solvedTitle;
       elements.dialogText.textContent = object.solvedText;
       elements.dialogMemory.textContent = object.solvedMemory;
@@ -394,7 +458,7 @@ function showHint() {
 
   const names = {
     clock: "絵の「七」と日記の「四つの五分」を時計に重ねよう。",
-    painting: "左の壁にある、ふたりで描いた夜の絵を調べよう。",
+    painting: "絵に残る跡を、地面に近いものから空の奥へなぞろう。",
     book: "書きかけの言葉は、中央の机に残されている。",
     plant: "出口のそばにある、枯れた青い花も忘れずに。",
   };
@@ -430,6 +494,7 @@ function resetGame({ showIntro = false } = {}) {
   state.activeObject = null;
   state.clockHour = 12;
   state.clockMinute = 0;
+  state.paintingSequence = [];
 
   elements.hotspots.forEach((hotspot) => hotspot.classList.remove("is-found"));
   elements.door.classList.remove("is-unlocked", "is-open");
@@ -438,6 +503,8 @@ function resetGame({ showIntro = false } = {}) {
   hideOverlay(elements.ending);
   elements.clockPuzzle.hidden = true;
   elements.clockFeedback.textContent = "";
+  elements.paintingPuzzle.hidden = true;
+  elements.paintingFeedback.textContent = "";
   elements.fragment.hidden = false;
   updateProgress();
   elements.memoryText.textContent =
@@ -481,6 +548,9 @@ elements.clockResetButton.addEventListener("click", () => {
   playSound("ui");
 });
 elements.clockSubmitButton.addEventListener("click", solveClock);
+elements.paintingSymbols.forEach((symbol) => {
+  symbol.addEventListener("click", () => selectPaintingSymbol(symbol.dataset.paintingSymbol));
+});
 elements.resetButton.addEventListener("click", () => resetGame({ showIntro: true }));
 elements.replayButton.addEventListener("click", () => resetGame());
 
