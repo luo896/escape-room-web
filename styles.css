@@ -643,6 +643,7 @@ h2 {
   z-index: 30;
   inset: 0;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   place-items: center;
   padding: 22px;
   visibility: hidden;
@@ -661,7 +662,9 @@ h2 {
 .dialog-card,
 .ending-card {
   position: relative;
-  width: min(560px, 100%);
+  width: 100%;
+  max-width: 560px;
+  min-width: 0;
   padding: clamp(32px, 7vw, 66px);
   border: 1px solid rgba(216, 199, 167, 0.24);
   border-radius: 3px;
