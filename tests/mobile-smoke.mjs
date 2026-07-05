@@ -132,17 +132,36 @@ try {
         click("#dialog-action");
         await wait(100);
 
-        for (const id of ["book", "plant"]) {
-          click('[data-object="' + id + '"]');
-          await wait(80);
-          stories.push({
-            id,
-            visible: document.querySelector("#dialog").classList.contains("is-visible"),
-            quote: document.querySelector("#dialog-memory").textContent.trim(),
-          });
-          click("#dialog-action");
-          await wait(100);
-        }
+        click('[data-object="book"]');
+        await wait(80);
+        click("#book-submit-button");
+        const bookWrongAnswer = document.querySelector("#book-feedback").textContent.trim();
+        const bookProgressBeforeSolve =
+          document.querySelector("#progress-label").textContent.trim();
+        const bookAnswer = ["キ", "オ", "ク"];
+        document.querySelectorAll("[data-book-letter]").forEach((select, index) => {
+          select.value = bookAnswer[index];
+          select.dispatchEvent(new Event("change", { bubbles: true }));
+        });
+        click("#book-submit-button");
+        await wait(100);
+        stories.push({
+          id: "book",
+          visible: document.querySelector("#dialog").classList.contains("is-visible"),
+          quote: document.querySelector("#dialog-memory").textContent.trim(),
+        });
+        click("#dialog-action");
+        await wait(100);
+
+        click('[data-object="plant"]');
+        await wait(80);
+        stories.push({
+          id: "plant",
+          visible: document.querySelector("#dialog").classList.contains("is-visible"),
+          quote: document.querySelector("#dialog-memory").textContent.trim(),
+        });
+        click("#dialog-action");
+        await wait(100);
 
         click('[data-object="clock"]');
         await wait(80);
@@ -187,6 +206,14 @@ try {
         resetState.paintingStep = document.querySelector("#painting-step").textContent.trim();
         resetState.paintingFeedback =
           document.querySelector("#painting-feedback").textContent.trim();
+        click("#dialog-action");
+        click('[data-object="book"]');
+        await wait(80);
+        resetState.bookAnswer = [...document.querySelectorAll("[data-book-letter]")]
+          .map((select) => select.value)
+          .join("");
+        resetState.bookFeedback =
+          document.querySelector("#book-feedback").textContent.trim();
 
         return {
           viewport: { width: innerWidth, height: innerHeight },
@@ -202,6 +229,8 @@ try {
           audioOn,
           paintingWrongAnswer,
           paintingProgressBeforeSolve,
+          bookWrongAnswer,
+          bookProgressBeforeSolve,
           wrongAnswer,
           progressBeforeSolve,
           clockTime,
@@ -238,6 +267,9 @@ try {
     paintingPuzzle:
       report.paintingWrongAnswer.length > 0 &&
       report.paintingProgressBeforeSolve === "手がかり 0 / 4",
+    bookPuzzle:
+      report.bookWrongAnswer.length > 0 &&
+      report.bookProgressBeforeSolve === "手がかり 1 / 4",
     completed: report.progress === "手がかり 4 / 4" && report.fragmentCount === 4,
     escaped: report.doorOpen && report.endingVisible,
     reset:
@@ -246,7 +278,9 @@ try {
       report.resetState.fragmentCount === 0 &&
       report.resetState.feedback === "" &&
       report.resetState.paintingStep === "0 / 3" &&
-      report.resetState.paintingFeedback === "",
+      report.resetState.paintingFeedback === "" &&
+      report.resetState.bookAnswer === "" &&
+      report.resetState.bookFeedback === "",
   };
 
   console.log(JSON.stringify({ checks, report }, null, 2));

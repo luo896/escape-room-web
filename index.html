@@ -230,6 +230,67 @@
           </div>
           <p id="painting-feedback" class="puzzle-feedback" role="status"></p>
         </section>
+        <section
+          id="book-puzzle"
+          class="puzzle-panel book-puzzle"
+          aria-labelledby="book-puzzle-title"
+          hidden
+        >
+          <div class="puzzle-heading">
+            <p id="book-puzzle-title">置き換えられた三文字を戻す</p>
+            <span class="book-code-label">暗号</span>
+          </div>
+          <div class="book-page">
+            <p class="book-rule">
+              元の文字は、五十音表で<br />
+              <strong>一つ後ろの文字</strong>に置き換えた。
+            </p>
+            <div class="book-code" aria-label="暗号文 ク カ ケ">
+              <span>ク</span>
+              <span>カ</span>
+              <span>ケ</span>
+            </div>
+          </div>
+          <div class="book-answer" aria-label="復号した三文字">
+            <label>
+              <span>一文字目</span>
+              <select data-book-letter="0">
+                <option value="">？</option>
+                <option value="カ">カ</option>
+                <option value="キ">キ</option>
+                <option value="ク">ク</option>
+                <option value="ケ">ケ</option>
+                <option value="コ">コ</option>
+              </select>
+            </label>
+            <label>
+              <span>二文字目</span>
+              <select data-book-letter="1">
+                <option value="">？</option>
+                <option value="ア">ア</option>
+                <option value="イ">イ</option>
+                <option value="ウ">ウ</option>
+                <option value="エ">エ</option>
+                <option value="オ">オ</option>
+              </select>
+            </label>
+            <label>
+              <span>三文字目</span>
+              <select data-book-letter="2">
+                <option value="">？</option>
+                <option value="カ">カ</option>
+                <option value="キ">キ</option>
+                <option value="ク">ク</option>
+                <option value="ケ">ケ</option>
+                <option value="コ">コ</option>
+              </select>
+            </label>
+          </div>
+          <p id="book-feedback" class="puzzle-feedback" role="status"></p>
+          <button id="book-submit-button" class="puzzle-submit" type="button">
+            この言葉で日記を開く
+          </button>
+        </section>
         <div id="fragment" class="fragment" aria-live="polite">
           <span>鍵の欠片を見つけた</span>
           <strong id="fragment-mark"></strong>

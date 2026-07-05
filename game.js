@@ -25,9 +25,12 @@ const OBJECTS = {
   },
   book: {
     kicker: "澪の日記",
-    title: "最後のページ",
-    text: "赤い日記の最後だけが切り抜かれている。その空洞には、波模様の欠片と録音用の小さな紙片があった。",
-    memory: "『波を四度数えて。ひとつの波は五分。忘れたものを集めた人にだけ扉は応える』",
+    title: "置き換えられた言葉",
+    text: "赤い日記の留め金には、三つの文字盤がある。最後のページに残された暗号を元の言葉へ戻せば開きそうだ。",
+    memory: "『書かれた文字を、そのひとつ前へ。私たちが失くしかけたものを思い出して』",
+    solvedTitle: "キオク",
+    solvedText: "文字盤を「キ・オ・ク」に合わせると留め金が外れた。切り抜かれたページの空洞から、波模様の金属片が現れる。",
+    solvedMemory: "『波を四度数えて。ひとつの波は五分。忘れたものを集めた人にだけ扉は応える』",
     mark: "波",
     symbol: "≈",
     message: "澪は、自分の意思で扉の向こうへ進んだらしい。",
@@ -52,6 +55,7 @@ const state = {
   clockHour: 12,
   clockMinute: 0,
   paintingSequence: [],
+  bookLetters: ["", "", ""],
 };
 
 let audioContext = null;
@@ -86,6 +90,10 @@ const elements = {
   paintingSymbols: [...document.querySelectorAll("[data-painting-symbol]")],
   paintingSequenceSlots: [...document.querySelectorAll(".sequence-track span")],
   paintingFeedback: document.querySelector("#painting-feedback"),
+  bookPuzzle: document.querySelector("#book-puzzle"),
+  bookLetters: [...document.querySelectorAll("[data-book-letter]")],
+  bookFeedback: document.querySelector("#book-feedback"),
+  bookSubmitButton: document.querySelector("#book-submit-button"),
   fragment: document.querySelector("#fragment"),
   fragmentMark: document.querySelector("#fragment-mark"),
   progressLabel: document.querySelector("#progress-label"),
@@ -373,6 +381,34 @@ function selectPaintingSymbol(symbol) {
   }
 }
 
+function resetBookPuzzle() {
+  state.bookLetters = ["", "", ""];
+  elements.bookLetters.forEach((select) => {
+    select.value = "";
+  });
+  elements.bookFeedback.textContent = "";
+}
+
+function solveBook() {
+  state.bookLetters = elements.bookLetters.map((select) => select.value);
+
+  if (state.bookLetters.join("") !== "キオク") {
+    elements.bookFeedback.textContent =
+      "留め金は開かない。暗号の各文字を、五十音表で一つ前に戻そう。";
+    playSound("wrong");
+    return;
+  }
+
+  const object = OBJECTS.book;
+  elements.bookPuzzle.hidden = true;
+  elements.fragment.hidden = false;
+  elements.dialogTitle.textContent = object.solvedTitle;
+  elements.dialogText.textContent = object.solvedText;
+  elements.dialogMemory.textContent = object.solvedMemory;
+  collectObject("book");
+  elements.memoryText.textContent = object.solvedMemory;
+}
+
 function inspectObject(id) {
   const object = OBJECTS[id];
   if (!object) return;
@@ -386,6 +422,7 @@ function inspectObject(id) {
   elements.fragmentMark.textContent = object.mark;
   elements.clockPuzzle.hidden = true;
   elements.paintingPuzzle.hidden = true;
+  elements.bookPuzzle.hidden = true;
   elements.fragment.hidden = false;
 
   if (id === "clock" && !state.found.has("clock")) {
@@ -401,6 +438,11 @@ function inspectObject(id) {
     elements.paintingFeedback.textContent = "";
     updatePaintingPuzzle();
     playSound("ui");
+  } else if (id === "book" && !state.found.has("book")) {
+    elements.bookPuzzle.hidden = false;
+    elements.fragment.hidden = true;
+    resetBookPuzzle();
+    playSound("ui");
   } else if (!state.found.has(id)) {
     collectObject(id);
   } else {
@@ -409,6 +451,10 @@ function inspectObject(id) {
       elements.dialogText.textContent = object.solvedText;
       elements.dialogMemory.textContent = object.solvedMemory;
     } else if (id === "painting") {
+      elements.dialogTitle.textContent = object.solvedTitle;
+      elements.dialogText.textContent = object.solvedText;
+      elements.dialogMemory.textContent = object.solvedMemory;
+    } else if (id === "book") {
       elements.dialogTitle.textContent = object.solvedTitle;
       elements.dialogText.textContent = object.solvedText;
       elements.dialogMemory.textContent = object.solvedMemory;
@@ -459,7 +505,7 @@ function showHint() {
   const names = {
     clock: "絵の「七」と日記の「四つの五分」を時計に重ねよう。",
     painting: "絵に残る跡を、地面に近いものから空の奥へなぞろう。",
-    book: "書きかけの言葉は、中央の机に残されている。",
+    book: "「ク・カ・ケ」を、五十音表でそれぞれ一つ前の文字へ戻そう。",
     plant: "出口のそばにある、枯れた青い花も忘れずに。",
   };
 
@@ -495,6 +541,7 @@ function resetGame({ showIntro = false } = {}) {
   state.clockHour = 12;
   state.clockMinute = 0;
   state.paintingSequence = [];
+  state.bookLetters = ["", "", ""];
 
   elements.hotspots.forEach((hotspot) => hotspot.classList.remove("is-found"));
   elements.door.classList.remove("is-unlocked", "is-open");
@@ -505,6 +552,8 @@ function resetGame({ showIntro = false } = {}) {
   elements.clockFeedback.textContent = "";
   elements.paintingPuzzle.hidden = true;
   elements.paintingFeedback.textContent = "";
+  elements.bookPuzzle.hidden = true;
+  resetBookPuzzle();
   elements.fragment.hidden = false;
   updateProgress();
   elements.memoryText.textContent =
@@ -551,6 +600,14 @@ elements.clockSubmitButton.addEventListener("click", solveClock);
 elements.paintingSymbols.forEach((symbol) => {
   symbol.addEventListener("click", () => selectPaintingSymbol(symbol.dataset.paintingSymbol));
 });
+elements.bookLetters.forEach((select, index) => {
+  select.addEventListener("change", () => {
+    state.bookLetters[index] = select.value;
+    elements.bookFeedback.textContent = "";
+    playSound("ui");
+  });
+});
+elements.bookSubmitButton.addEventListener("click", solveBook);
 elements.resetButton.addEventListener("click", () => resetGame({ showIntro: true }));
 elements.replayButton.addEventListener("click", () => resetGame());
 

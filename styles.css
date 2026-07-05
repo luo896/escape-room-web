@@ -972,6 +972,88 @@ h2 {
   background: rgba(217, 168, 94, 0.09);
 }
 
+.book-code-label {
+  color: #a88e69;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+}
+
+.book-page {
+  margin: 12px 0;
+  padding: 13px 14px;
+  border: 1px solid rgba(99, 69, 47, 0.45);
+  color: #3b3026;
+  background:
+    linear-gradient(90deg, transparent 0 9%, rgba(120, 69, 52, 0.14) 9% 9.5%, transparent 9.5%),
+    repeating-linear-gradient(#cbbd9d 0 24px, #b8aa8b 25px);
+  box-shadow: inset 0 0 22px rgba(68, 48, 31, 0.2);
+}
+
+.book-rule {
+  margin: 0;
+  color: #43372b !important;
+  font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+  font-size: 0.76rem;
+  line-height: 1.65 !important;
+  text-align: left;
+}
+
+.book-rule strong {
+  color: #713f35;
+}
+
+.book-code {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  margin-top: 10px;
+}
+
+.book-code span {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid rgba(80, 53, 37, 0.38);
+  color: #4a382a;
+  background: rgba(246, 235, 205, 0.28);
+  font-family: "Yu Mincho", serif;
+  font-size: 1.15rem;
+}
+
+.book-answer {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.book-answer label {
+  display: grid;
+  gap: 4px;
+}
+
+.book-answer label > span {
+  color: #8c8377;
+  font-size: 0.62rem;
+}
+
+.book-answer select {
+  width: 100%;
+  padding: 8px 4px;
+  border: 1px solid rgba(216, 199, 167, 0.24);
+  border-radius: 0;
+  color: var(--gold-bright);
+  background: #17191c;
+  font: inherit;
+  text-align: center;
+}
+
+.book-answer select:focus-visible {
+  border-color: var(--gold);
+  outline: 1px solid var(--gold);
+}
+
 .primary-button {
   min-width: 180px;
   margin-top: 18px;
