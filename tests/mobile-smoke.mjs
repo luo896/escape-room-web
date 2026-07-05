@@ -155,6 +155,23 @@ try {
 
         click('[data-object="plant"]');
         await wait(80);
+        click("#plant-submit-button");
+        const plantWrongAnswer = document.querySelector("#plant-feedback").textContent.trim();
+        const plantProgressBeforeSolve =
+          document.querySelector("#progress-label").textContent.trim();
+        for (let index = 0; index < 1; index += 1) {
+          click('[data-plant-leaf="1"]');
+        }
+        for (let index = 0; index < 2; index += 1) {
+          click('[data-plant-leaf="2"]');
+        }
+        for (let index = 0; index < 3; index += 1) {
+          click('[data-plant-leaf="3"]');
+        }
+        const plantAngles = [...document.querySelectorAll("[data-plant-leaf]")]
+          .map((leaf) => leaf.style.transform);
+        click("#plant-submit-button");
+        await wait(100);
         stories.push({
           id: "plant",
           visible: document.querySelector("#dialog").classList.contains("is-visible"),
@@ -214,6 +231,13 @@ try {
           .join("");
         resetState.bookFeedback =
           document.querySelector("#book-feedback").textContent.trim();
+        click("#dialog-action");
+        click('[data-object="plant"]');
+        await wait(80);
+        resetState.plantAngles = [...document.querySelectorAll("[data-plant-leaf]")]
+          .map((leaf) => leaf.style.transform);
+        resetState.plantFeedback =
+          document.querySelector("#plant-feedback").textContent.trim();
 
         return {
           viewport: { width: innerWidth, height: innerHeight },
@@ -231,6 +255,9 @@ try {
           paintingProgressBeforeSolve,
           bookWrongAnswer,
           bookProgressBeforeSolve,
+          plantWrongAnswer,
+          plantProgressBeforeSolve,
+          plantAngles,
           wrongAnswer,
           progressBeforeSolve,
           clockTime,
@@ -270,6 +297,11 @@ try {
     bookPuzzle:
       report.bookWrongAnswer.length > 0 &&
       report.bookProgressBeforeSolve === "手がかり 1 / 4",
+    plantPuzzle:
+      report.plantWrongAnswer.length > 0 &&
+      report.plantProgressBeforeSolve === "手がかり 2 / 4" &&
+      report.plantAngles.join("|") ===
+        "translateX(-50%) rotate(0deg)|translateX(-50%) rotate(90deg)|translateX(-50%) rotate(180deg)|translateX(-50%) rotate(270deg)",
     completed: report.progress === "手がかり 4 / 4" && report.fragmentCount === 4,
     escaped: report.doorOpen && report.endingVisible,
     reset:
@@ -280,7 +312,11 @@ try {
       report.resetState.paintingStep === "0 / 3" &&
       report.resetState.paintingFeedback === "" &&
       report.resetState.bookAnswer === "" &&
-      report.resetState.bookFeedback === "",
+      report.resetState.bookFeedback === "" &&
+      report.resetState.plantAngles.every(
+        (transform) => transform === "translateX(-50%) rotate(0deg)",
+      ) &&
+      report.resetState.plantFeedback === "",
   };
 
   console.log(JSON.stringify({ checks, report }, null, 2));

@@ -291,6 +291,55 @@
             この言葉で日記を開く
           </button>
         </section>
+        <section
+          id="plant-puzzle"
+          class="puzzle-panel plant-puzzle"
+          aria-labelledby="plant-puzzle-title"
+          hidden
+        >
+          <div class="puzzle-heading">
+            <p id="plant-puzzle-title">四枚の葉を、時の方角へ向ける</p>
+            <span class="plant-step">90°ずつ回転</span>
+          </div>
+          <p class="plant-rule">
+            小さい葉から順に、<strong>朝 → 昼 → 夕 → 夜</strong>へ。
+          </p>
+          <div class="plant-dial" aria-label="朝、昼、夕、夜の方角盤">
+            <span class="plant-direction plant-direction-morning">朝</span>
+            <span class="plant-direction plant-direction-noon">昼</span>
+            <span class="plant-direction plant-direction-evening">夕</span>
+            <span class="plant-direction plant-direction-night">夜</span>
+            <span class="plant-center" aria-hidden="true"></span>
+            <button
+              class="plant-leaf plant-leaf-1"
+              type="button"
+              data-plant-leaf="0"
+              aria-label="一番小さい葉、現在は朝向き"
+            ></button>
+            <button
+              class="plant-leaf plant-leaf-2"
+              type="button"
+              data-plant-leaf="1"
+              aria-label="二番目に小さい葉、現在は朝向き"
+            ></button>
+            <button
+              class="plant-leaf plant-leaf-3"
+              type="button"
+              data-plant-leaf="2"
+              aria-label="三番目に小さい葉、現在は朝向き"
+            ></button>
+            <button
+              class="plant-leaf plant-leaf-4"
+              type="button"
+              data-plant-leaf="3"
+              aria-label="一番大きい葉、現在は朝向き"
+            ></button>
+          </div>
+          <p id="plant-feedback" class="puzzle-feedback" role="status"></p>
+          <button id="plant-submit-button" class="puzzle-submit" type="button">
+            この向きで土を調べる
+          </button>
+        </section>
         <div id="fragment" class="fragment" aria-live="polite">
           <span>鍵の欠片を見つけた</span>
           <strong id="fragment-mark"></strong>

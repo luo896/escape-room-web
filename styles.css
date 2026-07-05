@@ -1054,6 +1054,129 @@ h2 {
   outline: 1px solid var(--gold);
 }
 
+.plant-step {
+  color: #7fa78e;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.68rem;
+}
+
+.plant-rule {
+  margin: 10px 0 0;
+  color: #aaa195 !important;
+  font-size: 0.74rem;
+  line-height: 1.5 !important;
+}
+
+.plant-rule strong {
+  color: #b9d1bd;
+}
+
+.plant-dial {
+  position: relative;
+  width: 178px;
+  height: 178px;
+  margin: 10px auto 4px;
+  border: 1px solid rgba(125, 166, 141, 0.3);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, rgba(80, 112, 91, 0.18) 0 34%, transparent 35%),
+    linear-gradient(90deg, transparent 49.5%, rgba(125, 166, 141, 0.12) 50%, transparent 50.5%),
+    linear-gradient(transparent 49.5%, rgba(125, 166, 141, 0.12) 50%, transparent 50.5%),
+    rgba(7, 15, 12, 0.38);
+}
+
+.plant-direction {
+  position: absolute;
+  z-index: 4;
+  color: #91a596;
+  font-family: "Yu Mincho", serif;
+  font-size: 0.68rem;
+}
+
+.plant-direction-morning {
+  top: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.plant-direction-noon {
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+}
+
+.plant-direction-evening {
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.plant-direction-night {
+  top: 50%;
+  left: 8px;
+  transform: translateY(-50%);
+}
+
+.plant-center {
+  position: absolute;
+  z-index: 3;
+  top: calc(50% - 9px);
+  left: calc(50% - 9px);
+  width: 18px;
+  height: 18px;
+  border: 2px solid #7b966f;
+  border-radius: 50%;
+  background: #263726;
+  box-shadow: 0 0 16px rgba(109, 151, 117, 0.24);
+}
+
+.plant-leaf {
+  --leaf-length: 42px;
+  --leaf-width: 17px;
+  position: absolute;
+  z-index: 2;
+  bottom: 50%;
+  left: 50%;
+  width: var(--leaf-width);
+  height: var(--leaf-length);
+  border: 1px solid rgba(157, 190, 155, 0.55);
+  border-radius: 80% 12% 80% 12%;
+  background: linear-gradient(100deg, #304c35, #668267);
+  box-shadow: 0 0 0 2px rgba(5, 9, 7, 0.42);
+  cursor: pointer;
+  transform-origin: 50% 100%;
+  transition: transform 180ms ease, filter 160ms ease;
+}
+
+.plant-leaf:hover,
+.plant-leaf:focus-visible {
+  filter: brightness(1.35);
+  outline: 1px solid #a7c8a7;
+}
+
+.plant-leaf-1 {
+  --leaf-length: 34px;
+  --leaf-width: 14px;
+  z-index: 6;
+}
+
+.plant-leaf-2 {
+  --leaf-length: 45px;
+  --leaf-width: 16px;
+  z-index: 5;
+}
+
+.plant-leaf-3 {
+  --leaf-length: 56px;
+  --leaf-width: 18px;
+  z-index: 4;
+}
+
+.plant-leaf-4 {
+  --leaf-length: 67px;
+  --leaf-width: 20px;
+}
+
 .primary-button {
   min-width: 180px;
   margin-top: 18px;

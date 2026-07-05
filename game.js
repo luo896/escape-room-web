@@ -37,9 +37,12 @@ const OBJECTS = {
   },
   plant: {
     kicker: "青い花の鉢",
-    title: "埋められた約束",
-    text: "澪の誕生日に贈った青い花は枯れていた。土をそっと払うと、太陽の印がある最後の欠片が現れる。",
-    memory: "『帰ったら、今度こそ一緒に海を見に行こう。約束を忘れないで』",
+    title: "時を向く四枚の葉",
+    text: "枯れた青い花の根元に、四枚の金属の葉が残っている。葉は一枚ずつ回り、鉢の縁には朝、昼、夕、夜の文字が刻まれている。",
+    memory: "『小さな葉から一日の順へ。朝、昼、夕、夜。全部が違う空を向いた時、約束は土から戻る』",
+    solvedTitle: "一日を巡る葉",
+    solvedText: "四枚の葉を朝、昼、夕、夜へ向けると、鉢底の仕掛けが外れた。土の中から太陽の印を刻んだ金属片が現れる。",
+    solvedMemory: "『帰ったら、今度こそ一緒に海を見に行こう。約束を忘れないで』",
     mark: "陽",
     symbol: "☀",
     message: "鉢の底に、澪と交わした約束が残されていた。",
@@ -56,6 +59,7 @@ const state = {
   clockMinute: 0,
   paintingSequence: [],
   bookLetters: ["", "", ""],
+  plantAngles: [0, 0, 0, 0],
 };
 
 let audioContext = null;
@@ -94,6 +98,10 @@ const elements = {
   bookLetters: [...document.querySelectorAll("[data-book-letter]")],
   bookFeedback: document.querySelector("#book-feedback"),
   bookSubmitButton: document.querySelector("#book-submit-button"),
+  plantPuzzle: document.querySelector("#plant-puzzle"),
+  plantLeaves: [...document.querySelectorAll("[data-plant-leaf]")],
+  plantFeedback: document.querySelector("#plant-feedback"),
+  plantSubmitButton: document.querySelector("#plant-submit-button"),
   fragment: document.querySelector("#fragment"),
   fragmentMark: document.querySelector("#fragment-mark"),
   progressLabel: document.querySelector("#progress-label"),
@@ -409,6 +417,54 @@ function solveBook() {
   elements.memoryText.textContent = object.solvedMemory;
 }
 
+function updatePlantPuzzle() {
+  const directions = ["朝", "昼", "夕", "夜"];
+  const sizes = ["一番小さい", "二番目に小さい", "三番目に小さい", "一番大きい"];
+
+  elements.plantLeaves.forEach((leaf, index) => {
+    const angle = state.plantAngles[index];
+    leaf.style.transform = `translateX(-50%) rotate(${angle}deg)`;
+    leaf.setAttribute(
+      "aria-label",
+      `${sizes[index]}葉、現在は${directions[angle / 90]}向き`,
+    );
+  });
+}
+
+function resetPlantPuzzle() {
+  state.plantAngles = [0, 0, 0, 0];
+  elements.plantFeedback.textContent = "";
+  updatePlantPuzzle();
+}
+
+function rotatePlantLeaf(index) {
+  state.plantAngles[index] = (state.plantAngles[index] + 90) % 360;
+  elements.plantFeedback.textContent = "";
+  updatePlantPuzzle();
+  playSound("ui");
+}
+
+function solvePlant() {
+  const solution = [0, 90, 180, 270];
+  const isSolved = state.plantAngles.every((angle, index) => angle === solution[index]);
+
+  if (!isSolved) {
+    elements.plantFeedback.textContent =
+      "鉢底は動かない。葉の大きさと、一日の順をもう一度確かめよう。";
+    playSound("wrong");
+    return;
+  }
+
+  const object = OBJECTS.plant;
+  elements.plantPuzzle.hidden = true;
+  elements.fragment.hidden = false;
+  elements.dialogTitle.textContent = object.solvedTitle;
+  elements.dialogText.textContent = object.solvedText;
+  elements.dialogMemory.textContent = object.solvedMemory;
+  collectObject("plant");
+  elements.memoryText.textContent = object.solvedMemory;
+}
+
 function inspectObject(id) {
   const object = OBJECTS[id];
   if (!object) return;
@@ -423,6 +479,7 @@ function inspectObject(id) {
   elements.clockPuzzle.hidden = true;
   elements.paintingPuzzle.hidden = true;
   elements.bookPuzzle.hidden = true;
+  elements.plantPuzzle.hidden = true;
   elements.fragment.hidden = false;
 
   if (id === "clock" && !state.found.has("clock")) {
@@ -443,6 +500,11 @@ function inspectObject(id) {
     elements.fragment.hidden = true;
     resetBookPuzzle();
     playSound("ui");
+  } else if (id === "plant" && !state.found.has("plant")) {
+    elements.plantPuzzle.hidden = false;
+    elements.fragment.hidden = true;
+    resetPlantPuzzle();
+    playSound("ui");
   } else if (!state.found.has(id)) {
     collectObject(id);
   } else {
@@ -455,6 +517,10 @@ function inspectObject(id) {
       elements.dialogText.textContent = object.solvedText;
       elements.dialogMemory.textContent = object.solvedMemory;
     } else if (id === "book") {
+      elements.dialogTitle.textContent = object.solvedTitle;
+      elements.dialogText.textContent = object.solvedText;
+      elements.dialogMemory.textContent = object.solvedMemory;
+    } else if (id === "plant") {
       elements.dialogTitle.textContent = object.solvedTitle;
       elements.dialogText.textContent = object.solvedText;
       elements.dialogMemory.textContent = object.solvedMemory;
@@ -506,7 +572,7 @@ function showHint() {
     clock: "絵の「七」と日記の「四つの五分」を時計に重ねよう。",
     painting: "絵に残る跡を、地面に近いものから空の奥へなぞろう。",
     book: "「ク・カ・ケ」を、五十音表でそれぞれ一つ前の文字へ戻そう。",
-    plant: "出口のそばにある、枯れた青い花も忘れずに。",
+    plant: "小さい葉から、朝・昼・夕・夜の順に違う方角へ向けよう。",
   };
 
   setRoomMessage(names[next.dataset.object]);
@@ -542,6 +608,7 @@ function resetGame({ showIntro = false } = {}) {
   state.clockMinute = 0;
   state.paintingSequence = [];
   state.bookLetters = ["", "", ""];
+  state.plantAngles = [0, 0, 0, 0];
 
   elements.hotspots.forEach((hotspot) => hotspot.classList.remove("is-found"));
   elements.door.classList.remove("is-unlocked", "is-open");
@@ -554,6 +621,8 @@ function resetGame({ showIntro = false } = {}) {
   elements.paintingFeedback.textContent = "";
   elements.bookPuzzle.hidden = true;
   resetBookPuzzle();
+  elements.plantPuzzle.hidden = true;
+  resetPlantPuzzle();
   elements.fragment.hidden = false;
   updateProgress();
   elements.memoryText.textContent =
@@ -608,6 +677,10 @@ elements.bookLetters.forEach((select, index) => {
   });
 });
 elements.bookSubmitButton.addEventListener("click", solveBook);
+elements.plantLeaves.forEach((leaf) => {
+  leaf.addEventListener("click", () => rotatePlantLeaf(Number(leaf.dataset.plantLeaf)));
+});
+elements.plantSubmitButton.addEventListener("click", solvePlant);
 elements.resetButton.addEventListener("click", () => resetGame({ showIntro: true }));
 elements.replayButton.addEventListener("click", () => resetGame());
 
