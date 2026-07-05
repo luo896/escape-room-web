@@ -1,5 +1,7 @@
 const DEBUG_PORT = process.env.CHROME_DEBUG_PORT ?? "9222";
 const BASE_URL = process.env.GAME_URL ?? "http://127.0.0.1:8000/";
+const VIEWPORT_WIDTH = Number(process.env.VIEWPORT_WIDTH ?? 390);
+const VIEWPORT_HEIGHT = Number(process.env.VIEWPORT_HEIGHT ?? 844);
 
 async function getPageTarget() {
   const targets = await fetch(`http://127.0.0.1:${DEBUG_PORT}/json`).then((response) => {
@@ -69,12 +71,12 @@ try {
   await client.send("Page.enable");
   await client.send("Runtime.enable");
   await client.send("Emulation.setDeviceMetricsOverride", {
-    width: 390,
-    height: 844,
+    width: VIEWPORT_WIDTH,
+    height: VIEWPORT_HEIGHT,
     deviceScaleFactor: 1,
     mobile: true,
-    screenWidth: 390,
-    screenHeight: 844,
+    screenWidth: VIEWPORT_WIDTH,
+    screenHeight: VIEWPORT_HEIGHT,
   });
   await client.send("Emulation.setTouchEmulationEnabled", {
     enabled: true,
@@ -107,7 +109,7 @@ try {
         const audioOn = document.querySelector("#audio-button").getAttribute("aria-pressed");
 
         const stories = [];
-        for (const id of ["clock", "painting", "book", "plant"]) {
+        for (const id of ["painting", "book", "plant"]) {
           click('[data-object="' + id + '"]');
           await wait(80);
           stories.push({
@@ -119,12 +121,44 @@ try {
           await wait(100);
         }
 
+        click('[data-object="clock"]');
+        await wait(80);
+        click("#clock-submit-button");
+        const wrongAnswer = document.querySelector("#clock-feedback").textContent.trim();
+        const progressBeforeSolve = document.querySelector("#progress-label").textContent.trim();
+        for (let index = 0; index < 7; index += 1) click("#clock-hour-button");
+        for (let index = 0; index < 4; index += 1) click("#clock-minute-button");
+        const clockTime = document.querySelector("#clock-time").textContent.trim();
+        click("#clock-submit-button");
+        await wait(100);
+        stories.push({
+          id: "clock",
+          visible: document.querySelector("#dialog").classList.contains("is-visible"),
+          quote: document.querySelector("#dialog-memory").textContent.trim(),
+        });
+        click("#dialog-action");
+
         await wait(1700);
+        const completedProgress = document.querySelector("#progress-label").textContent.trim();
+        const completedFragmentCount =
+          document.querySelectorAll(".fragment-tray .is-found").length;
         const doorOpen = document.querySelector("#door").classList.contains("is-open");
         click("#door");
         await wait(150);
 
         const endingCard = document.querySelector(".ending-card").getBoundingClientRect();
+        const endingVisible = document.querySelector("#ending").classList.contains("is-visible");
+        click("#replay-button");
+        await wait(120);
+        click('[data-object="clock"]');
+        await wait(80);
+        const resetState = {
+          progress: document.querySelector("#progress-label").textContent.trim(),
+          clockTime: document.querySelector("#clock-time").textContent.trim(),
+          fragmentCount: document.querySelectorAll(".fragment-tray .is-found").length,
+          feedback: document.querySelector("#clock-feedback").textContent.trim(),
+        };
+
         return {
           viewport: { width: innerWidth, height: innerHeight },
           documentWidth: document.documentElement.scrollWidth,
@@ -137,11 +171,15 @@ try {
             endingCard.bottom <= innerHeight,
           audioOff,
           audioOn,
+          wrongAnswer,
+          progressBeforeSolve,
+          clockTime,
           stories,
-          progress: document.querySelector("#progress-label").textContent.trim(),
-          fragmentCount: document.querySelectorAll(".fragment-tray .is-found").length,
+          progress: completedProgress,
+          fragmentCount: completedFragmentCount,
           doorOpen,
-          endingVisible: document.querySelector("#ending").classList.contains("is-visible"),
+          endingVisible,
+          resetState,
         };
       })()
     `,
@@ -153,7 +191,8 @@ try {
 
   const report = result.result.value;
   const checks = {
-    viewport: report.viewport.width === 390 && report.viewport.height === 844,
+    viewport:
+      report.viewport.width === VIEWPORT_WIDTH && report.viewport.height === VIEWPORT_HEIGHT,
     noHorizontalOverflow:
       report.documentWidth <= report.viewport.width && report.bodyWidth <= report.viewport.width,
     overlaysFit: report.initialCardFits && report.endingCardFits,
@@ -161,8 +200,17 @@ try {
     storyDialogs:
       report.stories.length === 4 &&
       report.stories.every((story) => story.visible && story.quote.length > 0),
+    clockPuzzle:
+      report.wrongAnswer.length > 0 &&
+      report.progressBeforeSolve === "手がかり 3 / 4" &&
+      report.clockTime === "07:20",
     completed: report.progress === "手がかり 4 / 4" && report.fragmentCount === 4,
     escaped: report.doorOpen && report.endingVisible,
+    reset:
+      report.resetState.progress === "手がかり 0 / 4" &&
+      report.resetState.clockTime === "12:00" &&
+      report.resetState.fragmentCount === 0 &&
+      report.resetState.feedback === "",
   };
 
   console.log(JSON.stringify({ checks, report }, null, 2));

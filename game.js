@@ -1,18 +1,21 @@
 const OBJECTS = {
   clock: {
     kicker: "止まった時計",
-    title: "二十三時四十七分",
-    text: "時計は、澪が消えた時刻で止まっている。裏蓋を開けると、月の印を刻んだ金属片が落ちた。",
-    memory: "『停電しても、時計だけは嘘をつかない。23:47を覚えていて』",
+    title: "動かない二本の針",
+    text: "裏蓋には月と波の刻印があり、二本の針だけが手で動く。正しい時刻に合わせれば、内部の鍵が外れそうだ。",
+    memory: "『月の位置を時に、波の数を分に。二つの記憶を重ねて』",
+    solvedTitle: "七時二十分",
+    solvedText: "二本の針が重なるように震え、裏蓋が開いた。中から月の印を刻んだ金属片が落ちる。",
+    solvedMemory: "『覚えていてくれたんだね。これで最初の鍵は開いた』",
     mark: "月",
     symbol: "☾",
-    message: "時計は、澪が消えた時刻を指している。",
+    message: "時計の内部から「月」の欠片を取り出した。",
   },
   painting: {
     kicker: "ふたりで描いた風景",
     title: "月のない夜",
     text: "幼い頃、澪と一緒に描いた山の絵だ。額縁の裏に、星形の金属片と短い手紙が貼られている。",
-    memory: "『お姉ちゃん。月が消えたら、星の位置を見て。入口は絵の中と同じ場所にある』",
+    memory: "『月は七つ目の刻で、山の稜線に触れた。入口は絵の中と同じ場所にある』",
     mark: "星",
     symbol: "✦",
     message: "古い絵は、扉の向こうの景色を描いている。",
@@ -21,7 +24,7 @@ const OBJECTS = {
     kicker: "澪の日記",
     title: "最後のページ",
     text: "赤い日記の最後だけが切り抜かれている。その空洞には、波模様の欠片と録音用の小さな紙片があった。",
-    memory: "『あの扉は、忘れたものを集めた人にだけ応える。私は先に行って確かめる』",
+    memory: "『波を四度数えて。ひとつの波は五分。忘れたものを集めた人にだけ扉は応える』",
     mark: "波",
     symbol: "≈",
     message: "澪は、自分の意思で扉の向こうへ進んだらしい。",
@@ -43,6 +46,8 @@ const state = {
   doorOpen: false,
   activeObject: null,
   audioEnabled: true,
+  clockHour: 12,
+  clockMinute: 0,
 };
 
 let audioContext = null;
@@ -61,6 +66,18 @@ const elements = {
   dialogText: document.querySelector("#dialog-text"),
   dialogMemory: document.querySelector("#dialog-memory"),
   dialogSymbol: document.querySelector("#dialog-symbol"),
+  clockPuzzle: document.querySelector("#clock-puzzle"),
+  clockTime: document.querySelector("#clock-time"),
+  clockHourHand: document.querySelector("#puzzle-hour-hand"),
+  clockMinuteHand: document.querySelector("#puzzle-minute-hand"),
+  clockHourButton: document.querySelector("#clock-hour-button"),
+  clockMinuteButton: document.querySelector("#clock-minute-button"),
+  clockResetButton: document.querySelector("#clock-reset-button"),
+  clockSubmitButton: document.querySelector("#clock-submit-button"),
+  clockFeedback: document.querySelector("#clock-feedback"),
+  paintingClue: document.querySelector("#painting-clue"),
+  bookClue: document.querySelector("#book-clue"),
+  fragment: document.querySelector("#fragment"),
   fragmentMark: document.querySelector("#fragment-mark"),
   progressLabel: document.querySelector("#progress-label"),
   progressFill: document.querySelector("#progress-fill"),
@@ -196,6 +213,8 @@ function playSound(name) {
     [392, 493.88, 587.33].forEach((frequency, index) => {
       window.setTimeout(() => createTone(frequency, 0.8, { volume: 0.085 }), index * 160);
     });
+  } else if (name === "wrong") {
+    createTone(196, 0.2, { type: "square", endFrequency: 155.56, volume: 0.035 });
   } else {
     createTone(330, 0.12, { volume: 0.045 });
   }
@@ -245,6 +264,63 @@ function unlockDoor() {
   }, 850);
 }
 
+function collectObject(id) {
+  const object = OBJECTS[id];
+  if (state.found.has(id)) return;
+
+  state.found.add(id);
+  document.querySelector(`[data-object="${id}"]`)?.classList.add("is-found");
+  updateProgress();
+  setRoomMessage(object.message);
+  elements.memoryText.textContent = object.memory;
+  playSound("discover");
+}
+
+function updateClockPuzzle() {
+  const displayHour = state.clockHour === 0 ? 12 : state.clockHour;
+  elements.clockTime.textContent =
+    `${String(displayHour).padStart(2, "0")}:${String(state.clockMinute).padStart(2, "0")}`;
+  elements.clockHourHand.style.transform =
+    `rotate(${(state.clockHour % 12) * 30 + state.clockMinute * 0.5}deg)`;
+  elements.clockMinuteHand.style.transform = `rotate(${state.clockMinute * 6}deg)`;
+
+  const hasPaintingClue = state.found.has("painting");
+  const hasBookClue = state.found.has("book");
+  elements.paintingClue.textContent = hasPaintingClue
+    ? "絵の記憶：月は「七つ目の刻」に触れた。"
+    : "絵に残された「時」の記憶が必要だ。";
+  elements.bookClue.textContent = hasBookClue
+    ? "日記の記憶：波は四度、ひとつは五分。"
+    : "日記に残された「分」の記憶が必要だ。";
+  elements.paintingClue.classList.toggle("is-unlocked", hasPaintingClue);
+  elements.bookClue.classList.toggle("is-unlocked", hasBookClue);
+}
+
+function adjustClock(unit) {
+  if (unit === "hour") state.clockHour = (state.clockHour + 1) % 12;
+  if (unit === "minute") state.clockMinute = (state.clockMinute + 5) % 60;
+  elements.clockFeedback.textContent = "";
+  updateClockPuzzle();
+  playSound("ui");
+}
+
+function solveClock() {
+  if (state.clockHour !== 7 || state.clockMinute !== 20) {
+    elements.clockFeedback.textContent = "針は反応しない。二つの記憶をもう一度確かめよう。";
+    playSound("wrong");
+    return;
+  }
+
+  const object = OBJECTS.clock;
+  elements.clockPuzzle.hidden = true;
+  elements.fragment.hidden = false;
+  elements.dialogTitle.textContent = object.solvedTitle;
+  elements.dialogText.textContent = object.solvedText;
+  elements.dialogMemory.textContent = object.solvedMemory;
+  collectObject("clock");
+  elements.memoryText.textContent = object.solvedMemory;
+}
+
 function inspectObject(id) {
   const object = OBJECTS[id];
   if (!object) return;
@@ -256,15 +332,23 @@ function inspectObject(id) {
   elements.dialogMemory.textContent = object.memory;
   elements.dialogSymbol.textContent = object.symbol;
   elements.fragmentMark.textContent = object.mark;
+  elements.clockPuzzle.hidden = true;
+  elements.fragment.hidden = false;
 
-  if (!state.found.has(id)) {
-    state.found.add(id);
-    document.querySelector(`[data-object="${id}"]`)?.classList.add("is-found");
-    updateProgress();
-    setRoomMessage(object.message);
-    elements.memoryText.textContent = object.memory;
-    playSound("discover");
+  if (id === "clock" && !state.found.has("clock")) {
+    elements.clockPuzzle.hidden = false;
+    elements.fragment.hidden = true;
+    elements.clockFeedback.textContent = "";
+    updateClockPuzzle();
+    playSound("ui");
+  } else if (!state.found.has(id)) {
+    collectObject(id);
   } else {
+    if (id === "clock") {
+      elements.dialogTitle.textContent = object.solvedTitle;
+      elements.dialogText.textContent = object.solvedText;
+      elements.dialogMemory.textContent = object.solvedMemory;
+    }
     playSound("ui");
   }
 
@@ -289,9 +373,18 @@ function showHint() {
     return;
   }
 
-  const next = elements.hotspots.find(
-    (hotspot) => !state.found.has(hotspot.dataset.object),
-  );
+  let next;
+  if (!state.found.has("clock") && !state.found.has("painting")) {
+    next = document.querySelector('[data-object="painting"]');
+  } else if (!state.found.has("clock") && !state.found.has("book")) {
+    next = document.querySelector('[data-object="book"]');
+  } else if (!state.found.has("clock")) {
+    next = document.querySelector('[data-object="clock"]');
+  } else {
+    next = elements.hotspots.find(
+      (hotspot) => !state.found.has(hotspot.dataset.object),
+    );
+  }
 
   if (!next) {
     setRoomMessage("四つの記憶が揃った。澪が封じた扉に注目しよう。");
@@ -300,7 +393,7 @@ function showHint() {
   }
 
   const names = {
-    clock: "中央の壁で、澪が消えた時刻を指すものを探そう。",
+    clock: "絵の「七」と日記の「四つの五分」を時計に重ねよう。",
     painting: "左の壁にある、ふたりで描いた夜の絵を調べよう。",
     book: "書きかけの言葉は、中央の机に残されている。",
     plant: "出口のそばにある、枯れた青い花も忘れずに。",
@@ -335,12 +428,17 @@ function resetGame({ showIntro = false } = {}) {
   state.doorUnlocked = false;
   state.doorOpen = false;
   state.activeObject = null;
+  state.clockHour = 12;
+  state.clockMinute = 0;
 
   elements.hotspots.forEach((hotspot) => hotspot.classList.remove("is-found"));
   elements.door.classList.remove("is-unlocked", "is-open");
   elements.door.setAttribute("aria-label", "閉ざされた扉");
   hideOverlay(elements.dialog);
   hideOverlay(elements.ending);
+  elements.clockPuzzle.hidden = true;
+  elements.clockFeedback.textContent = "";
+  elements.fragment.hidden = false;
   updateProgress();
   elements.memoryText.textContent =
     "妹の澪が消えた夜、この部屋だけが内側から閉ざされた。";
@@ -373,6 +471,16 @@ elements.dialog.addEventListener("click", (event) => {
 elements.door.addEventListener("click", enterDoor);
 elements.hintButton.addEventListener("click", showHint);
 elements.audioButton.addEventListener("click", toggleAudio);
+elements.clockHourButton.addEventListener("click", () => adjustClock("hour"));
+elements.clockMinuteButton.addEventListener("click", () => adjustClock("minute"));
+elements.clockResetButton.addEventListener("click", () => {
+  state.clockHour = 12;
+  state.clockMinute = 0;
+  elements.clockFeedback.textContent = "";
+  updateClockPuzzle();
+  playSound("ui");
+});
+elements.clockSubmitButton.addEventListener("click", solveClock);
 elements.resetButton.addEventListener("click", () => resetGame({ showIntro: true }));
 elements.replayButton.addEventListener("click", () => resetGame());
 

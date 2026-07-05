@@ -163,6 +163,30 @@
         <h2 id="dialog-title"></h2>
         <p id="dialog-text"></p>
         <blockquote id="dialog-memory" class="dialog-memory"></blockquote>
+        <section id="clock-puzzle" class="puzzle-panel" aria-labelledby="clock-puzzle-title" hidden>
+          <div class="puzzle-heading">
+            <p id="clock-puzzle-title">二つの記憶を時計に合わせる</p>
+            <output id="clock-time" aria-live="polite">12:00</output>
+          </div>
+          <div class="puzzle-clock" aria-hidden="true">
+            <span id="puzzle-hour-hand" class="puzzle-hand puzzle-hour-hand"></span>
+            <span id="puzzle-minute-hand" class="puzzle-hand puzzle-minute-hand"></span>
+            <span class="puzzle-clock-pin"></span>
+          </div>
+          <div class="puzzle-controls" aria-label="時計を調整">
+            <button id="clock-hour-button" type="button">時 ＋1</button>
+            <button id="clock-minute-button" type="button">分 ＋5</button>
+            <button id="clock-reset-button" type="button">戻す</button>
+          </div>
+          <ul class="puzzle-clues">
+            <li id="painting-clue">絵に残された「時」の記憶が必要だ。</li>
+            <li id="book-clue">日記に残された「分」の記憶が必要だ。</li>
+          </ul>
+          <p id="clock-feedback" class="puzzle-feedback" role="status"></p>
+          <button id="clock-submit-button" class="puzzle-submit" type="button">
+            この時刻で合わせる
+          </button>
+        </section>
         <div id="fragment" class="fragment" aria-live="polite">
           <span>鍵の欠片を見つけた</span>
           <strong id="fragment-mark"></strong>
