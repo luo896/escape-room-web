@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="4つの手がかりを見つけて、不思議な部屋から脱出する短編ポイント＆クリックゲーム。"
+    />
+    <title>四つの欠片 — 脱出ゲーム</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="game-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">SHORT ESCAPE GAME</p>
+          <h1>四つの欠片</h1>
+        </div>
+        <div class="topbar-actions">
+          <div class="progress" aria-live="polite">
+            <span id="progress-label">手がかり 0 / 4</span>
+            <div class="progress-track" aria-hidden="true">
+              <span id="progress-fill"></span>
+            </div>
+          </div>
+          <button id="reset-button" class="icon-button" type="button">最初から</button>
+        </div>
+      </header>
+
+      <section id="room" class="room" aria-label="古い書斎">
+        <div class="wall-light" aria-hidden="true"></div>
+        <div class="ceiling-line" aria-hidden="true"></div>
+
+        <button
+          class="object hotspot clock"
+          type="button"
+          data-object="clock"
+          aria-label="止まった時計を調べる"
+        >
+          <span class="clock-face">
+            <span class="clock-hand hour"></span>
+            <span class="clock-hand minute"></span>
+          </span>
+          <span class="object-glow" aria-hidden="true"></span>
+        </button>
+
+        <button
+          class="object hotspot painting"
+          type="button"
+          data-object="painting"
+          aria-label="壁の絵を調べる"
+        >
+          <span class="painting-inner">
+            <span class="moon"></span>
+            <span class="mountain mountain-one"></span>
+            <span class="mountain mountain-two"></span>
+          </span>
+          <span class="object-glow" aria-hidden="true"></span>
+        </button>
+
+        <div class="desk" aria-hidden="true">
+          <div class="desk-top"></div>
+          <div class="desk-leg desk-leg-left"></div>
+          <div class="desk-leg desk-leg-right"></div>
+        </div>
+
+        <button
+          class="object hotspot book"
+          type="button"
+          data-object="book"
+          aria-label="机の上の本を調べる"
+        >
+          <span class="book-pages"></span>
+          <span class="book-cover">記憶</span>
+          <span class="object-glow" aria-hidden="true"></span>
+        </button>
+
+        <button
+          class="object hotspot plant"
+          type="button"
+          data-object="plant"
+          aria-label="植木鉢を調べる"
+        >
+          <span class="leaf leaf-one"></span>
+          <span class="leaf leaf-two"></span>
+          <span class="leaf leaf-three"></span>
+          <span class="pot"></span>
+          <span class="object-glow" aria-hidden="true"></span>
+        </button>
+
+        <button id="door" class="door" type="button" aria-label="閉ざされた扉">
+          <span class="door-panel panel-top"></span>
+          <span class="door-panel panel-bottom"></span>
+          <span class="door-knob"></span>
+          <span class="door-sign">EXIT</span>
+          <span class="door-light" aria-hidden="true"></span>
+        </button>
+
+        <div class="floor-lines" aria-hidden="true"></div>
+        <p id="room-message" class="room-message" aria-live="polite">
+          部屋を調べて、扉を開ける方法を探そう。
+        </p>
+      </section>
+
+      <footer class="hintbar">
+        <p><span class="pulse-dot"></span>光っている場所をクリックして調べる</p>
+        <button id="hint-button" class="text-button" type="button">ヒントを見る</button>
+      </footer>
+    </main>
+
+    <section id="intro" class="overlay is-visible" aria-labelledby="intro-title">
+      <div class="intro-card">
+        <p class="eyebrow">A TINY MYSTERY</p>
+        <h2 id="intro-title">四つの欠片</h2>
+        <p>
+          目を覚ますと、見知らぬ書斎にいた。<br />
+          扉には四つの空洞がある。
+        </p>
+        <p class="intro-note">部屋に隠された四つの欠片を探し、ここから脱出しよう。</p>
+        <button id="start-button" class="primary-button" type="button">調査を始める</button>
+      </div>
+    </section>
+
+    <section
+      id="dialog"
+      class="overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="dialog-title"
+    >
+      <div class="dialog-card">
+        <button id="dialog-close" class="dialog-close" type="button" aria-label="閉じる">×</button>
+        <div id="dialog-symbol" class="found-symbol" aria-hidden="true"></div>
+        <p id="dialog-kicker" class="eyebrow"></p>
+        <h2 id="dialog-title"></h2>
+        <p id="dialog-text"></p>
+        <div id="fragment" class="fragment" aria-live="polite">
+          <span>鍵の欠片を見つけた</span>
+          <strong id="fragment-mark"></strong>
+        </div>
+        <button id="dialog-action" class="primary-button" type="button">部屋に戻る</button>
+      </div>
+    </section>
+
+    <section id="ending" class="overlay" aria-labelledby="ending-title">
+      <div class="ending-card">
+        <div class="ending-halo" aria-hidden="true"></div>
+        <p class="eyebrow">ESCAPED</p>
+        <h2 id="ending-title">扉の向こうへ</h2>
+        <p>四つの欠片がひとつの鍵になった。</p>
+        <p>冷たい夜風が頬を撫でる。あなたは無事、部屋を脱出した。</p>
+        <button id="replay-button" class="primary-button" type="button">もう一度遊ぶ</button>
+      </div>
+    </section>
+
+    <script src="game.js"></script>
+  </body>
+</html>
